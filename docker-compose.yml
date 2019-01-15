@@ -1,34 +1,33 @@
 version: "2"
 
+####################################
 # browse http://localhost:8080/ 
 # follow the installation dialogue
-
+####################################
 
 services:
 
-  db:
+  mysql:
     image: mariadb
-    ports:
-      - "8081:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ChangeMeIfYouWant
-  
-  # db:
-  #   image: postgres:10
-  #   restart: always
-  #   ports:
-  #     - 8081:5432
-  #   environment:
-  #     POSTGRES_PASSWORD: example
-
-  web:
-    image: wordpress
-    restart: always
+    container_name: mysql
     volumes:
-      - ./:/var/www/html
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    restart: always
+
+  wordpress:
+    image: wordpress  #:php7.2-fpm
+    container_name: wordpress
+    volumes:
+      - ./wordpress:/var/www/html
+    environment:
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_TABLE_PREFIX=wp_
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_PASSWORD=password
+    links:
+      - mysql
+    restart: always
     ports:
       - "8080:80"
-    links:
-      - db:mysql  # mysql = database name in the wp container
-    environment:
-      WORDPRESS_DB_PASSWORD: ChangeMeIfYouWant
